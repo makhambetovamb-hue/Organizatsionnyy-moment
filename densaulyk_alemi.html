@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ДЕНСАУЛЫҚ ӘЛЕМІНЕ САЯХАТ</title>
+<style>
+  :root {
+    --font-main: 'Times New Roman', Times, Georgia, serif;
+    --bg-sky: #87CEEB;
+    --bg-mint: #98FB98;
+    --bg-gold: #FFE87C;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font-main);
+    background: radial-gradient(circle at 15% 15%, #FFF8D6 0%, #A8EDEA 32%, #74EBD5 65%, #68BBE3 100%);
+    position: relative;
+  }
+
+  /* Ambient Pixar-style soft lighting & bokeh orbs */
+  .ambient-scene {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .sun-rays {
+    position: absolute;
+    top: -18vh;
+    left: -12vw;
+    width: 65vw;
+    height: 65vw;
+    background: radial-gradient(circle, rgba(255, 243, 176, 0.75) 0%, rgba(255, 223, 107, 0.25) 45%, transparent 70%);
+    border-radius: 50%;
+    animation: pulseGlow 7s ease-in-out infinite alternate;
+  }
+
+  .meadow-hill {
+    position: absolute;
+    bottom: -14vh;
+    left: -10vw;
+    width: 120vw;
+    height: 26vh;
+    background: linear-gradient(180deg, #7EE88D 0%, #3BB75E 55%, #238E43 100%);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    box-shadow: inset 0 12px 30px rgba(255, 255, 255, 0.6), 0 -10px 40px rgba(59, 183, 94, 0.25);
+  }
+
+  .meadow-hill-back {
+    position: absolute;
+    bottom: -11vh;
+    right: -15vw;
+    width: 90vw;
+    height: 24vh;
+    background: linear-gradient(180deg, #A3F79B 0%, #4CD070 100%);
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    opacity: 0.85;
+  }
+
+  .floating-character {
+    position: absolute;
+    filter: drop-shadow(0 14px 20px rgba(0, 45, 80, 0.22));
+    animation: floatBob 5.5s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  .char-sun { top: 2vh; left: 2.2vw; width: clamp(82px, 7.5vw, 135px); animation-delay: 0s; }
+  .char-heart { top: 2.5vh; right: 2.4vw; width: clamp(78px, 7vw, 128px); animation-delay: 1.2s; }
+  .char-apple { bottom: 2.5vh; left: 2vw; width: clamp(76px, 6.8vw, 124px); animation-delay: 2.1s; }
+  .char-drop { bottom: 3vh; right: 2.2vw; width: clamp(72px, 6.4vw, 118px); animation-delay: 0.7s; }
+  .char-kids { bottom: 1.5vh; left: 50%; transform: translateX(-50%); width: clamp(135px, 12vw, 220px); animation: kidsBounce 4s ease-in-out infinite; opacity: 0.92; }
+
+  @keyframes floatBob {
+    0%, 100% { transform: translateY(0px) rotate(-2deg); }
+    50% { transform: translateY(-10px) rotate(3deg); }
+  }
+
+  @keyframes kidsBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0px); }
+    50% { transform: translateX(-50%) translateY(-7px); }
+  }
+
+  @keyframes pulseGlow {
+    0% { transform: scale(1); opacity: 0.85; }
+    100% { transform: scale(1.08); opacity: 1; }
+  }
+
+  /* Main 16:9 Stage Container */
+  .stage-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.4vh 6.5vw 2.4vh 6.5vw;
+  }
+
+  /* Header Glass Banner */
+  .header-panel {
+    width: 100%;
+    max-width: 1480px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.84) 0%, rgba(235, 250, 255, 0.74) 100%);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 3px solid rgba(255, 255, 255, 0.92);
+    border-radius: 28px;
+    padding: 1.1vh 2.5vw 1.3vh 2.5vw;
+    text-align: center;
+    box-shadow:
+      0 14px 32px rgba(13, 71, 114, 0.18),
+      inset 0 4px 10px rgba(255, 255, 255, 0.95),
+      inset 0 -4px 10px rgba(104, 187, 227, 0.25);
+    position: relative;
+  }
+
+  .main-title {
+    font-family: var(--font-main);
+    font-size: clamp(26px, 3.1vw, 54px);
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    background: linear-gradient(180deg, #0B4F8A 0%, #157F5C 55%, #D98A00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 0 rgba(255,255,255,0.95)) drop-shadow(0 4px 8px rgba(11, 79, 138, 0.22));
+    line-height: 1.12;
+  }
+
+  .subtitle {
+    font-family: var(--font-main);
+    font-size: clamp(18px, 1.75vw, 31px);
+    font-weight: 700;
+    color: #0D5C46;
+    margin-top: 0.3vh;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .instruction-pill {
+    display: inline-block;
+    margin-top: 0.55vh;
+    padding: 0.45vh 1.8vw;
+    background: linear-gradient(180deg, #FFE66D 0%, #FFB703 100%);
+    border: 2.5px solid #FFFDF5;
+    border-radius: 50px;
+    font-family: var(--font-main);
+    font-size: clamp(16px, 1.48vw, 26px);
+    font-weight: 700;
+    color: #3D2200;
+    box-shadow:
+      0 6px 14px rgba(217, 138, 0, 0.32),
+      inset 0 3px 6px rgba(255, 255, 255, 0.85);
+  }
+
+  /* 5x3 Cards Grid */
+  .cards-grid {
+    width: 100%;
+    max-width: 1520px;
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: clamp(10px, 1.25vw, 22px);
+    margin: 1.4vh 0 1.2vh 0;
+    perspective: 1800px;
+  }
+
+  .card-slot {
+    width: 100%;
+    height: 100%;
+    perspective: 1400px;
+    cursor: pointer;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .card-slot:not(.is-flipped):hover {
+    transform: translateY(-6px) scale(1.035);
+  }
+
+  .card-slot.is-flipped {
+    cursor: default;
+  }
+
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.85s cubic-bezier(0.22, 1.15, 0.36, 1);
+  }
+
+  .card-slot.is-flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 24px;
+    border: 3.5px solid rgba(255, 255, 255, 0.92);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0.9vh 0.9vw;
+    box-shadow:
+      0 14px 26px rgba(10, 48, 82, 0.24),
+      inset 0 6px 14px rgba(255, 255, 255, 0.72),
+      inset 0 -8px 16px rgba(0, 0, 0, 0.16);
+    overflow: hidden;
+  }
+
+  /* Glossy 3D Pixar highlight overlay */
+  .card-face::before {
+    content: "";
+    position: absolute;
+    top: -40%;
+    left: -20%;
+    width: 140%;
+    height: 75%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.04) 100%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* Front Face Styling: Number + 3D Symbol + Warm Wish */
+  .card-front {
+    justify-content: space-between;
+    padding: 0.9vh 0.85vw;
+    text-align: center;
+  }
+
+  .card-front-top {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.2vw;
+    z-index: 2;
+  }
+
+  .card-number-badge {
+    width: clamp(36px, 3vw, 54px);
+    height: clamp(36px, 3vw, 54px);
+    border-radius: 50%;
+    background: linear-gradient(180deg, #FFFFFF 0%, #EBF5FF 100%);
+    border: 2.5px solid rgba(255, 255, 255, 0.98);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-main);
+    font-size: clamp(20px, 1.8vw, 32px);
+    font-weight: 900;
+    color: #0D3B66;
+    box-shadow:
+      0 5px 12px rgba(0, 0, 0, 0.22),
+      inset 0 -3px 5px rgba(13, 59, 102, 0.18);
+    flex-shrink: 0;
+  }
+
+  .card-symbol-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.24));
+  }
+
+  .card-symbol-wrap svg {
+    width: clamp(38px, 3.3vw, 60px);
+    height: clamp(38px, 3.3vw, 60px);
+  }
+
+  .front-wish-box {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.88);
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 0.55vh 0.65vw;
+    margin-top: 0.6vh;
+    box-shadow:
+      0 4px 10px rgba(0, 0, 0, 0.14),
+      inset 0 2px 6px rgba(255, 255, 255, 0.95);
+    z-index: 2;
+  }
+
+  .wish-text {
+    font-family: var(--font-main);
+    font-size: clamp(15px, 1.38vw, 24px);
+    font-weight: 700;
+    color: #0B3954;
+    line-height: 1.2;
+  }
+
+  /* Back Face Styling: Group Emblem & Name directly on flip */
+  .card-back {
+    transform: rotateY(180deg);
+    justify-content: center;
+    align-items: center;
+    padding: 1vh 0.8vw;
+    text-align: center;
+  }
+
+  .group-badge-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+  }
+
+  .card-slot.is-flipped .group-badge-box {
+    animation: popEmblem 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  @keyframes popEmblem {
+    0% { transform: scale(0.55); opacity: 0.2; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .group-emblem-icon {
+    width: clamp(54px, 4.6vw, 84px);
+    height: clamp(54px, 4.6vw, 84px);
+    filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
+    margin-bottom: 0.4vh;
+  }
+
+  .group-number-label {
+    font-family: var(--font-main);
+    font-size: clamp(17px, 1.4vw, 25px);
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.96);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.38);
+  }
+
+  .group-title-label {
+    font-family: var(--font-main);
+    font-size: clamp(21px, 1.88vw, 34px);
+    font-weight: 900;
+    color: #FFFFFF;
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.44);
+    letter-spacing: 0.6px;
+    margin-top: 0.25vh;
+  }
+
+  /* Group Themes */
+  .theme-group-1 {
+    background: linear-gradient(145deg, #FF7B54 0%, #FF4B2B 55%, #D92638 100%) !important;
+    border-color: #FFF3B0 !important;
+  }
+
+  .theme-group-2 {
+    background: linear-gradient(145deg, #FFD166 0%, #F79D00 55%, #E07A00 100%) !important;
+    border-color: #FFFFFF !important;
+  }
+
+  .theme-group-3 {
+    background: linear-gradient(145deg, #38EF7D 0%, #11998E 60%, #0B6E68 100%) !important;
+    border-color: #E0FBF6 !important;
+  }
+
+  /* Final Celebration Screen Overlay */
+  .final-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: radial-gradient(circle at 50% 35%, rgba(255, 252, 230, 0.94) 0%, rgba(168, 237, 234, 0.95) 55%, rgba(104, 187, 227, 0.97) 100%);
+    backdrop-filter: blur(16px);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3vh 5vw;
+    text-align: center;
+    animation: fadeInOverlay 0.7s ease forwards;
+  }
+
+  .final-overlay.active {
+    display: flex;
+  }
+
+  @keyframes fadeInOverlay {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .final-card-panel {
+    width: 100%;
+    max-width: 1420px;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.9) 0%, rgba(240, 252, 255, 0.82) 100%);
+    border: 4px solid #FFFFFF;
+    border-radius: 36px;
+    padding: 3.5vh 3.5vw;
+    box-shadow:
+      0 24px 60px rgba(11, 79, 138, 0.26),
+      inset 0 6px 16px rgba(255, 255, 255, 0.95);
+    position: relative;
+    z-index: 2;
+  }
+
+  .final-title {
+    font-family: var(--font-main);
+    font-size: clamp(34px, 4.2vw, 72px);
+    font-weight: 900;
+    background: linear-gradient(180deg, #FF6B00 0%, #E63946 50%, #0B4F8A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 3px 0 #FFFFFF) drop-shadow(0 6px 14px rgba(230, 57, 70, 0.25));
+    margin-bottom: 1.5vh;
+  }
+
+  .final-message {
+    font-family: var(--font-main);
+    font-size: clamp(22px, 2.25vw, 40px);
+    font-weight: 700;
+    color: #0B3954;
+    line-height: 1.35;
+    max-width: 1180px;
+    margin: 0 auto 3.2vh auto;
+  }
+
+  .final-groups-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.2vw;
+    margin-bottom: 3.5vh;
+  }
+
+  .final-group-card {
+    border-radius: 28px;
+    border: 4px solid #FFFFFF;
+    padding: 2.4vh 1.5vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+      0 16px 32px rgba(10, 48, 82, 0.24),
+      inset 0 6px 14px rgba(255, 255, 255, 0.65);
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+  }
+
+  .final-group-card:hover {
+    transform: translateY(-6px);
+  }
+
+  .final-group-card svg {
+    width: clamp(72px, 6.2vw, 115px);
+    height: clamp(72px, 6.2vw, 115px);
+    filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.26));
+    margin-bottom: 1vh;
+  }
+
+  .final-group-num {
+    font-family: var(--font-main);
+    font-size: clamp(20px, 1.7vw, 30px);
+    font-weight: 700;
+    color: #FFFFFF;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+  }
+
+  .final-group-name {
+    font-family: var(--font-main);
+    font-size: clamp(26px, 2.4vw, 44px);
+    font-weight: 900;
+    color: #FFFFFF;
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+    margin-top: 0.4vh;
+  }
+
+  .restart-btn {
+    padding: 1.5vh 3.8vw;
+    font-family: var(--font-main);
+    font-size: clamp(22px, 2vw, 36px);
+    font-weight: 900;
+    color: #FFFFFF;
+    background: linear-gradient(180deg, #2EC4B6 0%, #0D7A70 100%);
+    border: 4px solid #FFFFFF;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow:
+      0 12px 28px rgba(13, 122, 112, 0.4),
+      inset 0 4px 10px rgba(255, 255, 255, 0.75);
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
+  }
+
+  .restart-btn:hover {
+    transform: scale(1.06);
+    filter: brightness(1.08);
+  }
+
+  .restart-btn:active {
+    transform: scale(0.97);
+  }
+
+  /* Confetti Canvas */
+  #confettiCanvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 60;
+  }
+
+  /* Responsive adjustments for smaller viewports */
+  @media (max-width: 980px) {
+    html, body {
+      overflow-y: auto;
+    }
+    .stage-wrapper {
+      height: auto;
+      min-height: 100vh;
+      padding: 16px;
+    }
+    .cards-grid {
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(5, minmax(175px, 1fr));
+      gap: 12px;
+    }
+    .final-groups-row {
+      grid-template-columns: 1fr;
+    }
+    .floating-character {
+      opacity: 0.45;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Pixar-style 3D Ambient Background & Characters -->
+  <div class="ambient-scene">
+    <div class="sun-rays"></div>
+    <div class="meadow-hill-back"></div>
+    <div class="meadow-hill"></div>
+
+    <!-- 3D Smiling Sun -->
+    <div class="floating-character char-sun">
+      <svg viewBox="0 0 140 140">
+        <defs>
+          <radialGradient id="sunCore" cx="35%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#FFF9C4"/>
+            <stop offset="50%" stop-color="#FFD54F"/>
+            <stop offset="100%" stop-color="#FF8F00"/>
+          </radialGradient>
+        </defs>
+        <g fill="#FFB300">
+          <circle cx="70" cy="12" r="9"/><circle cx="70" cy="128" r="9"/>
+          <circle cx="12" cy="70" r="9"/><circle cx="128" cy="70" r="9"/>
+          <circle cx="29" cy="29" r="8"/><circle cx="111" cy="111" r="8"/>
+          <circle cx="111" cy="29" r="8"/><circle cx="29" cy="111" r="8"/>
+        </g>
+        <circle cx="70" cy="70" r="44" fill="url(#sunCore)" stroke="#FFFDE7" stroke-width="3"/>
+        <ellipse cx="55" cy="50" rx="14" ry="8" fill="rgba(255,255,255,0.65)" transform="rotate(-25 55 50)"/>
+        <circle cx="56" cy="66" r="5" fill="#4E2A00"/>
+        <circle cx="84" cy="66" r="5" fill="#4E2A00"/>
+        <circle cx="58" cy="64" r="1.8" fill="#FFF"/>
+        <circle cx="86" cy="64" r="1.8" fill="#FFF"/>
+        <ellipse cx="47" cy="76" rx="6" ry="3.5" fill="rgba(255,100,100,0.45)"/>
+        <ellipse cx="93" cy="76" rx="6" ry="3.5" fill="rgba(255,100,100,0.45)"/>
+        <path d="M56 80 Q70 94 84 80" fill="none" stroke="#4E2A00" stroke-width="4.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- 3D Glossy Heart -->
+    <div class="floating-character char-heart">
+      <svg viewBox="0 0 140 140">
+        <defs>
+          <radialGradient id="heart3d" cx="35%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#FF9AA2"/>
+            <stop offset="45%" stop-color="#FF3B5C"/>
+            <stop offset="100%" stop-color="#A80024"/>
+          </radialGradient>
+        </defs>
+        <path d="M70 120 C70 120 16 84 16 46 C16 25 33 14 50 14 C61 14 67 21 70 28 C73 21 79 14 90 14 C107 14 124 25 124 46 C124 84 70 120 70 120 Z" fill="url(#heart3d)" stroke="#FFE5EC" stroke-width="3"/>
+        <ellipse cx="42" cy="36" rx="13" ry="7" fill="rgba(255,255,255,0.65)" transform="rotate(-32 42 36)"/>
+        <circle cx="56" cy="58" r="4.5" fill="#4A0010"/>
+        <circle cx="84" cy="58" r="4.5" fill="#4A0010"/>
+        <circle cx="57.5" cy="56.5" r="1.6" fill="#FFF"/>
+        <circle cx="85.5" cy="56.5" r="1.6" fill="#FFF"/>
+        <path d="M58 70 Q70 81 82 70" fill="none" stroke="#4A0010" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- 3D Juicy Apple Fruit -->
+    <div class="floating-character char-apple">
+      <svg viewBox="0 0 140 140">
+        <defs>
+          <radialGradient id="apple3d" cx="35%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#FF9E80"/>
+            <stop offset="45%" stop-color="#FF3D00"/>
+            <stop offset="100%" stop-color="#9E1B00"/>
+          </radialGradient>
+          <linearGradient id="leaf3d" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#B9F6CA"/>
+            <stop offset="100%" stop-color="#00C853"/>
+          </linearGradient>
+        </defs>
+        <path d="M68 34 Q70 16 82 12" fill="none" stroke="#6D4C41" stroke-width="6" stroke-linecap="round"/>
+        <path d="M72 28 Q96 14 106 30 Q90 42 72 28 Z" fill="url(#leaf3d)" stroke="#E8F5E9" stroke-width="2"/>
+        <path d="M70 38 C46 28 22 46 24 78 C26 108 50 124 70 118 C90 124 114 108 116 78 C118 46 94 28 70 38 Z" fill="url(#apple3d)" stroke="#FFCCBC" stroke-width="3"/>
+        <ellipse cx="46" cy="56" rx="12" ry="6.5" fill="rgba(255,255,255,0.65)" transform="rotate(-30 46 56)"/>
+        <circle cx="57" cy="74" r="4.5" fill="#3E1200"/>
+        <circle cx="83" cy="74" r="4.5" fill="#3E1200"/>
+        <path d="M60 86 Q70 95 80 86" fill="none" stroke="#3E1200" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- 3D Crystal Water Drop -->
+    <div class="floating-character char-drop">
+      <svg viewBox="0 0 140 140">
+        <defs>
+          <radialGradient id="drop3d" cx="35%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#E0F7FA"/>
+            <stop offset="45%" stop-color="#00B0FF"/>
+            <stop offset="100%" stop-color="#01579B"/>
+          </radialGradient>
+        </defs>
+        <path d="M70 14 C70 14 26 64 26 92 C26 116 46 130 70 130 C94 130 114 116 114 92 C114 64 70 14 70 14 Z" fill="url(#drop3d)" stroke="#E1F5FE" stroke-width="3"/>
+        <ellipse cx="52" cy="72" rx="10" ry="18" fill="rgba(255,255,255,0.62)" transform="rotate(20 52 72)"/>
+        <circle cx="58" cy="92" r="4.5" fill="#00264D"/>
+        <circle cx="82" cy="92" r="4.5" fill="#00264D"/>
+        <path d="M60 103 Q70 112 80 103" fill="none" stroke="#00264D" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <!-- 3D Happy Sporty Kids Trio -->
+    <div class="floating-character char-kids">
+      <svg viewBox="0 0 260 110">
+        <defs>
+          <radialGradient id="kidSkin" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#FFE0BD"/>
+            <stop offset="100%" stop-color="#F1B888"/>
+          </radialGradient>
+        </defs>
+        <!-- Left Kid -->
+        <circle cx="65" cy="52" r="22" fill="url(#kidSkin)" stroke="#FFF" stroke-width="2.5"/>
+        <path d="M44 46 Q65 22 86 46" fill="#4E342E"/>
+        <circle cx="58" cy="52" r="3" fill="#212121"/><circle cx="72" cy="52" r="3" fill="#212121"/>
+        <path d="M58 60 Q65 67 72 60" fill="none" stroke="#212121" stroke-width="2.8" stroke-linecap="round"/>
+        <path d="M42 98 C42 78 88 78 88 98 Z" fill="#FF7043" stroke="#FFF" stroke-width="2"/>
+        <!-- Center Kid -->
+        <circle cx="130" cy="42" r="25" fill="url(#kidSkin)" stroke="#FFF" stroke-width="2.5"/>
+        <path d="M106 36 Q130 10 154 36" fill="#263238"/>
+        <circle cx="122" cy="42" r="3.2" fill="#212121"/><circle cx="138" cy="42" r="3.2" fill="#212121"/>
+        <path d="M121 51 Q130 60 139 51" fill="none" stroke="#212121" stroke-width="3" stroke-linecap="round"/>
+        <path d="M102 98 C102 72 158 72 158 98 Z" fill="#29B6F6" stroke="#FFF" stroke-width="2"/>
+        <!-- Right Kid -->
+        <circle cx="195" cy="52" r="22" fill="url(#kidSkin)" stroke="#FFF" stroke-width="2.5"/>
+        <path d="M174 46 Q195 22 216 46" fill="#6D4C41"/>
+        <circle cx="188" cy="52" r="3" fill="#212121"/><circle cx="202" cy="52" r="3" fill="#212121"/>
+        <path d="M188 60 Q195 67 202 60" fill="none" stroke="#212121" stroke-width="2.8" stroke-linecap="round"/>
+        <path d="M172 98 C172 78 218 78 218 98 Z" fill="#66BB6A" stroke="#FFF" stroke-width="2"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Main Stage -->
+  <main class="stage-wrapper">
+    <header class="header-panel">
+      <h1 class="main-title">«ДЕНСАУЛЫҚ ӘЛЕМІНЕ САЯХАТ»</h1>
+      <p class="subtitle">«Жақсы көңіл күй – денсаулық кепілі!»</p>
+      <div class="instruction-pill">«Өзіңе ұнаған тілекті оқы да, карточканы басып өз тобыңды анықта!»</div>
+    </header>
+
+    <section class="cards-grid" id="cardsGrid" aria-label="Интерактивті карточкалар"></section>
+  </main>
+
+  <!-- Final Celebration Screen -->
+  <div class="final-overlay" id="finalOverlay">
+    <div class="final-card-panel">
+      <h2 class="final-title">«ЖАРАЙСЫҢДАР, БАЛАЛАР!»</h2>
+      <p class="final-message">«Денсаулық – адам өміріндегі ең басты байлық. Оны сақтау әрқайсымыздың өз қолымызда!»</p>
+
+      <div class="final-groups-row">
+        <div class="final-group-card theme-group-1">
+          <div id="finalIcon1"></div>
+          <div class="final-group-num">1-топ</div>
+          <div class="final-group-name">«КҮШ-ҚУАТ»</div>
+        </div>
+        <div class="final-group-card theme-group-2">
+          <div id="finalIcon2"></div>
+          <div class="final-group-num">2-топ</div>
+          <div class="final-group-name">«КӨҢІЛ-КҮЙ»</div>
+        </div>
+        <div class="final-group-card theme-group-3">
+          <div id="finalIcon3"></div>
+          <div class="final-group-num">3-топ</div>
+          <div class="final-group-name">«ӨМІР НӘРІ»</div>
+        </div>
+      </div>
+
+      <button type="button" class="restart-btn" id="restartBtn">ҚАЙТА БАСТАУ</button>
+    </div>
+  </div>
+
+  <canvas id="confettiCanvas"></canvas>
+
+<script>
+(() => {
+  // 15 Warm Wishes (shown on the front of each card)
+  const WISHES = [
+    "Денің сау, көңілің шат болсын!",
+    "Әр күнің қуанышқа толы болсын!",
+    "Күлімдеп жүр, денсаулығыңды күт!",
+    "Шымыр болып, шыныға бер!",
+    "Пайдалы тағам – мықты денсаулық!",
+    "Спортпен дос бол!",
+    "Тазалық – саулық негізі!",
+    "Әрдайым сергек әрі белсенді бол!",
+    "Денсаулық – ең қымбат байлығың!",
+    "Жақсы әдеттерді серік ет!",
+    "Күніңді көтеріңкі көңіл күймен баста!",
+    "Дұрыс тамақтан, ұзақ өмір сүр!",
+    "Таза ауада көбірек серуенде!",
+    "Өзіңді күт, денсаулығыңды бағала!",
+    "Бақытты балалық шақ тілеймін!"
+  ];
+
+  // 15 Distinct Pixar-style 3D Card Gradients
+  const CARD_GRADIENTS = [
+    "linear-gradient(145deg, #FF9A9E 0%, #F6416C 100%)",
+    "linear-gradient(145deg, #4FACFE 0%, #0072FF 100%)",
+    "linear-gradient(145deg, #43E97B 0%, #11998E 100%)",
+    "linear-gradient(145deg, #FFD26F 0%, #FF7B00 100%)",
+    "linear-gradient(145deg, #A18CD1 0%, #6A11CB 100%)",
+    "linear-gradient(145deg, #30CFD0 0%, #2575FC 100%)",
+    "linear-gradient(145deg, #FF758C 0%, #FF4B2B 100%)",
+    "linear-gradient(145deg, #56CCF2 0%, #2F80ED 100%)",
+    "linear-gradient(145deg, #84FAB0 0%, #1D976C 100%)",
+    "linear-gradient(145deg, #FBC2EB 0%, #A64AC9 100%)",
+    "linear-gradient(145deg, #FBD786 0%, #F7797D 100%)",
+    "linear-gradient(145deg, #38F9D7 0%, #0082C8 100%)",
+    "linear-gradient(145deg, #FF9966 0%, #FF5E62 100%)",
+    "linear-gradient(145deg, #7F7FD5 0%, #4A00E0 100%)",
+    "linear-gradient(145deg, #52E5E7 0%, #130CB7 100%)"
+  ];
+
+  // 15 Unique 3D Health Symbols (SVG)
+  const HEALTH_SYMBOLS = [
+    `<svg viewBox="0 0 100 100"><defs><radialGradient id="s1" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#FFD1DC"/><stop offset="50%" stop-color="#FF2E55"/><stop offset="100%" stop-color="#990022"/></radialGradient></defs><path d="M50 86 C50 86 12 60 12 34 C12 18 24 10 36 10 C44 10 48 15 50 20 C52 15 56 10 64 10 C76 10 88 18 88 34 C88 60 50 86 50 86 Z" fill="url(#s1)" stroke="#FFF" stroke-width="3"/><ellipse cx="32" cy="27" rx="9" ry="5" fill="rgba(255,255,255,0.65)" transform="rotate(-30 32 27)"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><radialGradient id="s2" cx="35%" cy="35%" r="65%"><stop offset="0%" stop-color="#FFFDE7"/><stop offset="55%" stop-color="#FFD600"/><stop offset="100%" stop-color="#FF6D00"/></radialGradient></defs><g fill="#FFE57F"><circle cx="50" cy="10" r="6"/><circle cx="50" cy="90" r="6"/><circle cx="10" cy="50" r="6"/><circle cx="90" cy="50" r="6"/><circle cx="22" cy="22" r="5.5"/><circle cx="78" cy="78" r="5.5"/><circle cx="78" cy="22" r="5.5"/><circle cx="22" cy="78" r="5.5"/></g><circle cx="50" cy="50" r="28" fill="url(#s2)" stroke="#FFF" stroke-width="3"/><ellipse cx="40" cy="38" rx="9" ry="5" fill="rgba(255,255,255,0.7)" transform="rotate(-25 40 38)"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><radialGradient id="s3" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#FFCCBC"/><stop offset="50%" stop-color="#FF3D00"/><stop offset="100%" stop-color="#8E0000"/></radialGradient></defs><path d="M50 26 Q52 12 62 10" fill="none" stroke="#5D4037" stroke-width="5" stroke-linecap="round"/><path d="M52 22 Q70 12 78 24 Q64 33 52 22 Z" fill="#69F0AE" stroke="#FFF" stroke-width="1.5"/><path d="M50 30 C32 22 16 36 18 58 C20 80 36 90 50 86 C64 90 80 80 82 58 C84 36 68 22 50 30 Z" fill="url(#s3)" stroke="#FFF" stroke-width="3"/><ellipse cx="34" cy="44" rx="8" ry="4.5" fill="rgba(255,255,255,0.65)" transform="rotate(-30 34 44)"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><linearGradient id="s4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E0F7FA"/><stop offset="50%" stop-color="#26C6DA"/><stop offset="100%" stop-color="#006064"/></linearGradient></defs><rect x="28" y="44" width="44" height="12" rx="6" fill="#ECEFF1" stroke="#FFF" stroke-width="2"/><rect x="14" y="28" width="12" height="44" rx="6" fill="url(#s4)" stroke="#FFF" stroke-width="2.5"/><rect x="24" y="34" width="9" height="32" rx="4.5" fill="url(#s4)" stroke="#FFF" stroke-width="2"/><rect x="74" y="28" width="12" height="44" rx="6" fill="url(#s4)" stroke="#FFF" stroke-width="2.5"/><rect x="67" y="34" width="9" height="32" rx="4.5" fill="url(#s4)" stroke="#FFF" stroke-width="2"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><radialGradient id="s5" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="45%" stop-color="#00E5FF"/><stop offset="100%" stop-color="#01579B"/></radialGradient></defs><path d="M50 12 C50 12 20 46 20 66 C20 83 33 92 50 92 C67 92 80 83 80 66 C80 46 50 12 50 12 Z" fill="url(#s5)" stroke="#FFF" stroke-width="3"/><ellipse cx="37" cy="56" rx="7" ry="13" fill="rgba(255,255,255,0.7)" transform="rotate(18 37 56)"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><radialGradient id="s6" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="70%" stop-color="#E0E0E0"/><stop offset="100%" stop-color="#757575"/></radialGradient></defs><circle cx="50" cy="50" r="38" fill="url(#s6)" stroke="#FFF" stroke-width="3"/><polygon points="50,34 64,44 59,60 41,60 36,44" fill="#263238"/><polygon points="50,12 60,21 40,21" fill="#263238"/><polygon points="84,38 76,50 82,62" fill="#263238"/><polygon points="16,38 24,50 18,62" fill="#263238"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><radialGradient id="s7" cx="35%" cy="25%" r="75%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="65%" stop-color="#E1F5FE"/><stop offset="100%" stop-color="#81D4FA"/></radialGradient></defs><path d="M30 22 C18 22 16 40 22 56 C27 70 30 86 38 86 C44 86 46 68 50 68 C54 68 56 86 62 86 C70 86 73 70 78 56 C84 40 82 22 70 22 C60 22 55 28 50 28 C45 28 40 22 30 22 Z" fill="url(#s7)" stroke="#FFF" stroke-width="3"/><ellipse cx="34" cy="34" rx="8" ry="4" fill="rgba(255,255,255,0.9)" transform="rotate(-20 34 34)"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><linearGradient id="s8" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFE082"/><stop offset="50%" stop-color="#FF6D00"/><stop offset="100%" stop-color="#BF360C"/></linearGradient></defs><path d="M68 30 Q74 12 86 16 Q80 28 68 30 Z" fill="#00E676" stroke="#FFF" stroke-width="1.5"/><path d="M64 28 Q62 10 74 10 Q74 24 64 28 Z" fill="#00C853" stroke="#FFF" stroke-width="1.5"/><path d="M62 28 C74 36 74 48 56 66 L22 86 C18 88 14 84 16 80 L36 46 C50 30 56 24 62 28 Z" fill="url(#s8)" stroke="#FFF" stroke-width="3"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><radialGradient id="s9" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#FFFDE7"/><stop offset="50%" stop-color="#FFD740"/><stop offset="100%" stop-color="#FF6F00"/></radialGradient></defs><polygon points="50,10 62,36 90,39 69,58 75,86 50,72 25,86 31,58 10,39 38,36" fill="url(#s9)" stroke="#FFF" stroke-width="3" stroke-linejoin="round"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><linearGradient id="s10" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#B9F6CA"/><stop offset="50%" stop-color="#00E676"/><stop offset="100%" stop-color="#00695C"/></linearGradient></defs><path d="M20 80 C20 36 52 16 84 18 C86 50 66 82 20 80 Z" fill="url(#s10)" stroke="#FFF" stroke-width="3"/><path d="M20 80 Q50 52 76 26" fill="none" stroke="#FFF" stroke-width="3.5" stroke-linecap="round"/></svg>`,
+    `<svg viewBox="0 0 100 100"><path d="M14 72 A36 36 0 0 1 86 72" fill="none" stroke="#FF5252" stroke-width="9" stroke-linecap="round"/><path d="M23 72 A27 27 0 0 1 77 72" fill="none" stroke="#FFD740" stroke-width="9" stroke-linecap="round"/><path d="M32 72 A18 18 0 0 1 68 72" fill="none" stroke="#69F0AE" stroke-width="9" stroke-linecap="round"/><circle cx="20" cy="74" r="11" fill="#FFF"/><circle cx="80" cy="74" r="11" fill="#FFF"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><radialGradient id="s12" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#FFF59D"/><stop offset="50%" stop-color="#FF9100"/><stop offset="100%" stop-color="#E65100"/></radialGradient></defs><circle cx="50" cy="54" r="34" fill="url(#s12)" stroke="#FFF" stroke-width="3"/><path d="M50 20 Q64 10 72 20 Q60 28 50 20 Z" fill="#00E676" stroke="#FFF" stroke-width="1.5"/><ellipse cx="38" cy="40" rx="8" ry="4.5" fill="rgba(255,255,255,0.65)" transform="rotate(-25 38 40)"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><linearGradient id="s13" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFF9C4"/><stop offset="50%" stop-color="#FFC107"/><stop offset="100%" stop-color="#FF6F00"/></linearGradient></defs><path d="M28 20 H72 V44 C72 60 60 68 50 68 C40 68 28 60 28 44 Z" fill="url(#s13)" stroke="#FFF" stroke-width="3"/><path d="M28 26 H16 C16 42 22 48 28 48" fill="none" stroke="#FFD54F" stroke-width="5"/><path d="M72 26 H84 C84 42 78 48 72 48" fill="none" stroke="#FFD54F" stroke-width="5"/><rect x="44" y="68" width="12" height="12" fill="#FFB300"/><rect x="32" y="80" width="36" height="9" rx="4" fill="url(#s13)" stroke="#FFF" stroke-width="2"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><radialGradient id="s14" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#FFFDE7"/><stop offset="55%" stop-color="#FFEA00"/><stop offset="100%" stop-color="#FF8F00"/></radialGradient></defs><circle cx="50" cy="50" r="38" fill="url(#s14)" stroke="#FFF" stroke-width="3"/><circle cx="38" cy="43" r="4.5" fill="#3E2723"/><circle cx="62" cy="43" r="4.5" fill="#3E2723"/><path d="M35 58 Q50 73 65 58" fill="none" stroke="#3E2723" stroke-width="4.5" stroke-linecap="round"/></svg>`,
+    `<svg viewBox="0 0 100 100"><defs><radialGradient id="s15" cx="35%" cy="30%" r="70%"><stop offset="0%" stop-color="#B9F6CA"/><stop offset="50%" stop-color="#00C853"/><stop offset="100%" stop-color="#004D40"/></radialGradient></defs><path d="M50 12 L82 24 V50 C82 72 50 88 50 88 C50 88 18 72 18 50 V24 Z" fill="url(#s15)" stroke="#FFF" stroke-width="3"/><rect x="44" y="32" width="12" height="34" rx="4" fill="#FFF"/><rect x="33" y="43" width="34" height="12" rx="4" fill="#FFF"/></svg>`
+  ];
+
+  // 3 Distinct 3D Group Emblems
+  const GROUP_META = {
+    1: {
+      numLabel: "1-топ",
+      title: "«КҮШ-ҚУАТ»",
+      themeClass: "theme-group-1",
+      iconSvg: `<svg viewBox="0 0 100 100">
+        <defs>
+          <radialGradient id="g1Bg" cx="35%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#FFF9C4"/>
+            <stop offset="55%" stop-color="#FFD600"/>
+            <stop offset="100%" stop-color="#FF6D00"/>
+          </radialGradient>
+        </defs>
+        <circle cx="50" cy="50" r="44" fill="rgba(255,255,255,0.22)" stroke="#FFF" stroke-width="3"/>
+        <polygon points="56,12 24,54 48,54 40,88 76,44 52,44" fill="url(#g1Bg)" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/>
+      </svg>`
+    },
+    2: {
+      numLabel: "2-топ",
+      title: "«КӨҢІЛ-КҮЙ»",
+      themeClass: "theme-group-2",
+      iconSvg: `<svg viewBox="0 0 100 100">
+        <defs>
+          <radialGradient id="g2Bg" cx="35%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="50%" stop-color="#FFF176"/>
+            <stop offset="100%" stop-color="#FF8F00"/>
+          </radialGradient>
+        </defs>
+        <circle cx="50" cy="50" r="44" fill="rgba(255,255,255,0.25)" stroke="#FFF" stroke-width="3"/>
+        <circle cx="50" cy="50" r="28" fill="url(#g2Bg)" stroke="#FFF" stroke-width="3"/>
+        <circle cx="41" cy="45" r="3.5" fill="#4E2A00"/>
+        <circle cx="59" cy="45" r="3.5" fill="#4E2A00"/>
+        <path d="M39 56 Q50 68 61 56" fill="none" stroke="#4E2A00" stroke-width="4" stroke-linecap="round"/>
+      </svg>`
+    },
+    3: {
+      numLabel: "3-топ",
+      title: "«ӨМІР НӘРІ»",
+      themeClass: "theme-group-3",
+      iconSvg: `<svg viewBox="0 0 100 100">
+        <defs>
+          <radialGradient id="g3Bg" cx="35%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="45%" stop-color="#80D8FF"/>
+            <stop offset="100%" stop-color="#0277BD"/>
+          </radialGradient>
+        </defs>
+        <circle cx="50" cy="50" r="44" fill="rgba(255,255,255,0.22)" stroke="#FFF" stroke-width="3"/>
+        <path d="M50 16 C50 16 24 46 24 64 C24 79 36 88 50 88 C64 88 76 79 76 64 C76 46 50 16 50 16 Z" fill="url(#g3Bg)" stroke="#FFF" stroke-width="3"/>
+        <path d="M50 68 Q62 54 70 58 Q62 72 50 68 Z" fill="#69F0AE"/>
+        <path d="M50 68 Q38 54 30 58 Q38 72 50 68 Z" fill="#00E676"/>
+      </svg>`
+    }
+  };
+
+  // Web Audio API Sound Effects
+  let audioCtx = null;
+  function playTone(type) {
+    try {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'flip') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.09);
+        osc.frequency.setValueAtTime(783.99, now + 0.18);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+        osc.start(now);
+        osc.stop(now + 0.42);
+      } else if (type === 'finish') {
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'triangle';
+          o.connect(g);
+          g.connect(audioCtx.destination);
+          o.frequency.setValueAtTime(freq, now + idx * 0.12);
+          g.gain.setValueAtTime(0.22, now + idx * 0.12);
+          g.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.12 + 0.55);
+          o.start(now + idx * 0.12);
+          o.stop(now + idx * 0.12 + 0.55);
+        });
+      }
+    } catch (e) {
+      // Ignore audio errors if blocked
+    }
+  }
+
+  // Fisher-Yates Shuffle
+  function shuffleArray(arr) {
+    const copy = [...arr];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  let completedCount = 0;
+  const cardsGrid = document.getElementById('cardsGrid');
+  const finalOverlay = document.getElementById('finalOverlay');
+  const restartBtn = document.getElementById('restartBtn');
+
+  // Render Final Screen Icons
+  document.getElementById('finalIcon1').innerHTML = GROUP_META[1].iconSvg;
+  document.getElementById('finalIcon2').innerHTML = GROUP_META[2].iconSvg;
+  document.getElementById('finalIcon3').innerHTML = GROUP_META[3].iconSvg;
+
+  function initGame() {
+    completedCount = 0;
+    finalOverlay.classList.remove('active');
+    stopConfetti();
+    cardsGrid.innerHTML = '';
+
+    // Strictly 5 + 5 + 5 group distribution, randomly assigned to the 15 cards
+    const groupPool = shuffleArray([1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3]);
+
+    for (let i = 0; i < 15; i++) {
+      const cardNumber = i + 1;
+      const wishText = WISHES[i];
+      const groupId = groupPool[i];
+      const groupInfo = GROUP_META[groupId];
+
+      const slot = document.createElement('div');
+      slot.className = 'card-slot';
+      slot.dataset.flipped = 'false';
+
+      slot.innerHTML = `
+        <div class="card-inner">
+          <div class="card-face card-front" style="background: ${CARD_GRADIENTS[i]};">
+            <div class="card-front-top">
+              <div class="card-number-badge">${cardNumber}</div>
+              <div class="card-symbol-wrap">${HEALTH_SYMBOLS[i]}</div>
+            </div>
+            <div class="front-wish-box">
+              <p class="wish-text">«${wishText}»</p>
+            </div>
+          </div>
+          <div class="card-face card-back ${groupInfo.themeClass}">
+            <div class="group-badge-box">
+              <div class="group-emblem-icon">${groupInfo.iconSvg}</div>
+              <div class="group-number-label">${groupInfo.numLabel}</div>
+              <div class="group-title-label">${groupInfo.title}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Flip card on click to directly reveal the group name & emblem (stays flipped)
+      slot.addEventListener('click', () => {
+        if (slot.dataset.flipped === 'true') return;
+        slot.dataset.flipped = 'true';
+        slot.classList.add('is-flipped');
+        playTone('flip');
+
+        completedCount++;
+        if (completedCount === 15) {
+          setTimeout(() => {
+            playTone('finish');
+            finalOverlay.classList.add('active');
+            startConfetti();
+          }, 1200);
+        }
+      });
+
+      cardsGrid.appendChild(slot);
+    }
+  }
+
+  // Confetti Celebration Engine
+  const canvas = document.getElementById('confettiCanvas');
+  const ctx = canvas.getContext('2d');
+  let confettiParticles = [];
+  let confettiAnimId = null;
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function startConfetti() {
+    confettiParticles = [];
+    const colors = ['#FF595E', '#FFCA3A', '#8AC926', '#1982C4', '#6A4C93', '#FF9F1C'];
+    for (let i = 0; i < 150; i++) {
+      confettiParticles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: Math.random() * 12 + 7,
+        h: Math.random() * 8 + 5,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        speedY: Math.random() * 3.5 + 2.2,
+        speedX: Math.random() * 2 - 1,
+        angle: Math.random() * 360,
+        spin: Math.random() * 8 - 4
+      });
+    }
+    animateConfetti();
+  }
+
+  function animateConfetti() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    confettiParticles.forEach(p => {
+      p.y += p.speedY;
+      p.x += p.speedX;
+      p.angle += p.spin;
+      if (p.y > canvas.height) {
+        p.y = -20;
+        p.x = Math.random() * canvas.width;
+      }
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.angle * Math.PI) / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    confettiAnimId = requestAnimationFrame(animateConfetti);
+  }
+
+  function stopConfetti() {
+    if (confettiAnimId) {
+      cancelAnimationFrame(confettiAnimId);
+      confettiAnimId = null;
+    }
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  restartBtn.addEventListener('click', () => {
+    playTone('flip');
+    initGame();
+  });
+
+  // Start initial session
+  initGame();
+})();
+</script>
+</body>
+</html>
